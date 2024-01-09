@@ -65,7 +65,7 @@ type Config struct {
 }
 ```
 
-One thing to note is that internaly Orale treats all configuration paths as
+One thing to note is that internally Orale treats all configuration paths as
 snake case, so like the example above, when you annotate the path of your
 config value, make sure to use snake case.
 
