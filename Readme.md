@@ -34,7 +34,9 @@ func main() {
   }
 
   var conf *Config
-  oraleConf.MustGet("", conf)
+  if err := oraleConf.Get("", conf); err != nil {
+    ...
+  }
 
   db, err := database.Connect(conf.Database)
   if err != nil {
