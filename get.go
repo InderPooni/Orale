@@ -7,42 +7,42 @@ import (
 	"unicode"
 )
 
-func (c *Config) Get(path string, target any) error {
+func (l *Loader) Get(path string, target any) error {
 	targetRefVal := reflect.ValueOf(target)
 	if targetRefVal.Kind() != reflect.Ptr {
 		return fmt.Errorf("target must be a pointer")
 	}
 	targetRefVal = targetRefVal.Elem()
 
-	return getFromConfig(c, path, targetRefVal, 0)
+	return getFromLoader(l, path, targetRefVal, 0)
 }
 
-func (c *Config) MustGet(path string, target any) {
-	err := c.Get(path, target)
+func (l *Loader) MustGet(path string, target any) {
+	err := l.Get(path, target)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, index int) error {
+func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, index int) error {
 	switch targetRefVal.Kind() {
 	case reflect.Ptr:
 		if targetRefVal.IsNil() {
 			targetRefVal.Set(reflect.New(targetRefVal.Type().Elem()))
 		}
-		return getFromConfig(c, currentPath, targetRefVal.Elem(), 0)
+		return getFromLoader(l, currentPath, targetRefVal.Elem(), 0)
 
 	case reflect.Struct:
 		for i := 0; i < targetRefVal.NumField(); i += 1 {
 			field := targetRefVal.Type().Field(i)
 			fieldTag := field.Tag.Get("config")
 			if fieldTag == "" {
-				fieldTag = defaultFieldTag(field.Name)
+				fieldTag = calDefaultFieldTag(field.Name)
 			}
 			if currentPath != "" {
 				fieldTag = currentPath + "." + fieldTag
 			}
-			if err := getFromConfig(c, fieldTag, targetRefVal.Field(i), 0); err != nil {
+			if err := getFromLoader(l, fieldTag, targetRefVal.Field(i), 0); err != nil {
 				return err
 			}
 		}
@@ -51,26 +51,26 @@ func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, in
 		if targetRefVal.IsNil() {
 			targetRefVal.Set(reflect.MakeSlice(targetRefVal.Type(), 0, 0))
 		}
-		valueLen, err := resolvePathLen(c, currentPath)
+		valueLen, err := resolvePathLen(l, currentPath)
 		if err != nil {
 			return err
 		}
 		if valueLen > 0 {
 			targetRefVal.Set(reflect.MakeSlice(targetRefVal.Type(), valueLen, valueLen))
 			for i := 0; i < valueLen; i += 1 {
-				if err := getFromConfig(c, fmt.Sprintf("%s[%d]", currentPath, i), targetRefVal.Index(i), 0); err != nil {
+				if err := getFromLoader(l, fmt.Sprintf("%s[%d]", currentPath, i), targetRefVal.Index(i), 0); err != nil {
 					return err
 				}
 			}
 		} else {
-			value, err := resolveValueFromConfig(c, currentPath)
+			value, err := resolveValue(l, currentPath)
 			if err != nil {
 				return err
 			}
 			if value != nil {
 				targetRefVal.Set(reflect.MakeSlice(targetRefVal.Type(), len(value), len(value)))
 				for i := 0; i < len(value); i += 1 {
-					if err := getFromConfig(c, currentPath, targetRefVal.Index(i), i); err != nil {
+					if err := getFromLoader(l, currentPath, targetRefVal.Index(i), i); err != nil {
 						return err
 					}
 				}
@@ -80,7 +80,7 @@ func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, in
 		}
 
 	case reflect.String:
-		value, err := resolveValueFromConfig(c, currentPath)
+		value, err := resolveValue(l, currentPath)
 		if err != nil {
 			return err
 		}
@@ -96,7 +96,7 @@ func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, in
 		}
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		value, err := resolveValueFromConfig(c, currentPath)
+		value, err := resolveValue(l, currentPath)
 		if err != nil {
 			return err
 		}
@@ -112,7 +112,7 @@ func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, in
 		}
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		value, err := resolveValueFromConfig(c, currentPath)
+		value, err := resolveValue(l, currentPath)
 		if err != nil {
 			return err
 		}
@@ -128,7 +128,7 @@ func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, in
 		}
 
 	case reflect.Float32, reflect.Float64:
-		value, err := resolveValueFromConfig(c, currentPath)
+		value, err := resolveValue(l, currentPath)
 		if err != nil {
 			return err
 		}
@@ -144,7 +144,7 @@ func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, in
 		}
 
 	case reflect.Bool:
-		value, err := resolveValueFromConfig(c, currentPath)
+		value, err := resolveValue(l, currentPath)
 		if err != nil {
 			return err
 		}
@@ -164,16 +164,16 @@ func getFromConfig(c *Config, currentPath string, targetRefVal reflect.Value, in
 	return nil
 }
 
-func resolveValueFromConfig(c *Config, targetPath string) ([]any, error) {
+func resolveValue(l *Loader, targetPath string) ([]any, error) {
 	if targetPath == "" {
 		return nil, fmt.Errorf("target path cannot be empty")
 	}
-	if value, ok := c.FlagValues[targetPath]; ok {
+	if value, ok := l.FlagValues[targetPath]; ok {
 		return value, nil
-	} else if value, ok := c.EnvironmentValues[targetPath]; ok {
+	} else if value, ok := l.EnvironmentValues[targetPath]; ok {
 		return value, nil
 	} else {
-		for _, file := range c.ConfigurationFiles {
+		for _, file := range l.ConfigurationFiles {
 			if value, ok := file.Values[targetPath]; ok {
 				return value, nil
 			}
@@ -182,13 +182,13 @@ func resolveValueFromConfig(c *Config, targetPath string) ([]any, error) {
 	return nil, nil
 }
 
-func resolvePathLen(c *Config, targetPath string) (int, error) {
+func resolvePathLen(l *Loader, targetPath string) (int, error) {
 	if targetPath == "" {
 		return 0, fmt.Errorf("target path cannot be empty")
 	}
 
 	flagPaths := map[string]bool{}
-	for flagPath := range c.FlagValues {
+	for flagPath := range l.FlagValues {
 		slicePath := getSlicePathFromSubjectAndTargetPaths(flagPath, targetPath)
 		if slicePath != "" {
 			flagPaths[slicePath] = true
@@ -199,7 +199,7 @@ func resolvePathLen(c *Config, targetPath string) (int, error) {
 	}
 
 	environmentPaths := map[string]bool{}
-	for environmentPath := range c.EnvironmentValues {
+	for environmentPath := range l.EnvironmentValues {
 		slicePath := getSlicePathFromSubjectAndTargetPaths(environmentPath, targetPath)
 		if slicePath != "" {
 			environmentPaths[slicePath] = true
@@ -209,7 +209,7 @@ func resolvePathLen(c *Config, targetPath string) (int, error) {
 		return len(environmentPaths), nil
 	}
 
-	for _, file := range c.ConfigurationFiles {
+	for _, file := range l.ConfigurationFiles {
 		filePaths := map[string]bool{}
 		for filePath := range file.Values {
 			slicePath := getSlicePathFromSubjectAndTargetPaths(filePath, targetPath)
@@ -243,7 +243,7 @@ func getSlicePathFromSubjectAndTargetPaths(subjectPath, targetPath string) strin
 	return subjectPath[:len(targetPath)+endIndexOffset+1]
 }
 
-func defaultFieldTag(fieldName string) string {
+func calDefaultFieldTag(fieldName string) string {
 	fieldTag := ""
 	for i, r := range fieldName {
 		if unicode.IsUpper(r) {

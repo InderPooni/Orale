@@ -6,8 +6,8 @@ import (
 	"github.com/robertwhurst/orale"
 )
 
-func newTestConfigSingleValues() *orale.Config {
-	return &orale.Config{
+func newTestLoaderSingleValues() *orale.Loader {
+	return &orale.Loader{
 		FlagValues: map[string][]any{
 			"a": {"1"},
 			"b": {"2"},
@@ -39,8 +39,8 @@ func newTestConfigSingleValues() *orale.Config {
 	}
 }
 
-func newTestConfigMultiValues() *orale.Config {
-	return &orale.Config{
+func newTestLoaderMultiValues() *orale.Loader {
+	return &orale.Loader{
 		FlagValues: map[string][]any{
 			"a": {"1", "2"},
 			"b": {"3", "4"},
@@ -74,7 +74,7 @@ func TestGet(t *testing.T) {
 
 		testStruct := TestStruct{}
 
-		conf := newTestConfigSingleValues()
+		conf := newTestLoaderSingleValues()
 		if err := conf.Get("", &testStruct); err != nil {
 			t.Fatal(err)
 		}
@@ -116,7 +116,7 @@ func TestGet(t *testing.T) {
 
 		testStruct := TestStruct{}
 
-		conf := newTestConfigMultiValues()
+		conf := newTestLoaderMultiValues()
 		if err := conf.Get("", &testStruct); err != nil {
 			t.Fatal(err)
 		}

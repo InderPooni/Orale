@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-func Load(applicationName string) (*Config, error) {
+func Load(applicationName string) (*Loader, error) {
 	workingDir, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func Load(applicationName string) (*Config, error) {
 	)
 }
 
-func LoadFromValues(programArgs []string, envVarPrefix string, envVars []string, configSearchStartPath string, configFileNames []string) (*Config, error) {
+func LoadFromValues(programArgs []string, envVarPrefix string, envVars []string, configSearchStartPath string, configFileNames []string) (*Loader, error) {
 	flagValues := loadFlags(programArgs)
 	environmentValues := loadEnvironment(envVarPrefix, envVars)
 	configurationFiles, err := loadConfigurationFiles(configSearchStartPath, configFileNames)
@@ -76,7 +76,7 @@ func LoadFromValues(programArgs []string, envVarPrefix string, envVars []string,
 		return nil, err
 	}
 
-	return &Config{
+	return &Loader{
 		FlagValues:         flagValues,
 		EnvironmentValues:  environmentValues,
 		ConfigurationFiles: configurationFiles,

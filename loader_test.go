@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"testing"
 
-	config "github.com/robertwhurst/orale"
+	"github.com/robertwhurst/orale"
 )
 
 var testAssetsPath string
@@ -41,13 +41,13 @@ func TestLoadAndGetConfig(t *testing.T) {
 		configSearchStartPath := testAssetsPath
 		configFileNames := []string{"test-config-3.toml"}
 
-		conf, err := config.LoadFromValues(programArgs, "TEST", envVars, configSearchStartPath, configFileNames)
+		loader, err := orale.LoadFromValues(programArgs, "TEST", envVars, configSearchStartPath, configFileNames)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		var testConfig TestConfig
-		if err := conf.Get("", &testConfig); err != nil {
+		if err := loader.Get("", &testConfig); err != nil {
 			t.Fatal(err)
 		}
 	})
