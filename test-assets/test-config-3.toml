@@ -1,0 +1,15 @@
+[[channels]]
+name = "Posts"
+id = "posts"
+
+[[channels]]
+name = "News Item"
+id = "news-item"
+
+[[channels]]
+name = "Event"
+id = "event"
+
+[[channels]]
+name = "Page"
+id = "page"
