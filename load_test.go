@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	orale "github.com/RobertWHurst/Orale"
+	"github.com/RobertWHurst/orale"
 )
 
 func TestLoad(t *testing.T) {

@@ -3,7 +3,7 @@ package orale_test
 import (
 	"testing"
 
-	orale "github.com/RobertWHurst/Orale"
+	orale "github.com/RobertWHurst/orale"
 )
 
 func newTestLoaderSingleValues() *orale.Loader {
