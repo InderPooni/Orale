@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/robertwhurst/orale"
+	"github.com/RobertWHurst/orale"
 )
 
 var testAssetsPath string

@@ -17,7 +17,7 @@ just a path by it as the first argument to MustGet or Get.
 package main
 
 import (
-  "github.com/robertwhurst/orale"
+  "github.com/RobertWHurst/Orale"
 
   ...
 )
