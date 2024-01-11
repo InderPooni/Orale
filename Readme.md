@@ -1,5 +1,7 @@
 # Órale
 
+![Órale Graphic](orale.png)
+
 A fantastic little config loader for go that collects configuration from flags,
 environment variables, and configuration files, then marshals the found values
 into your given structs.
