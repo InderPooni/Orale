@@ -129,11 +129,7 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 			strValue, ok := value[index].(string)
 			if ok {
 				targetRefVal.SetString(strValue)
-			} else {
-				targetRefVal.SetString("")
 			}
-		} else {
-			targetRefVal.SetString("")
 		}
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -145,11 +141,7 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 			int64Value, ok := value[index].(int64)
 			if ok {
 				targetRefVal.SetInt(int64Value)
-			} else {
-				targetRefVal.SetInt(0)
 			}
-		} else {
-			targetRefVal.SetInt(0)
 		}
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -161,11 +153,7 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 			uint64Value, ok := value[index].(uint64)
 			if ok && len(value) > 0 {
 				targetRefVal.SetUint(uint64Value)
-			} else {
-				targetRefVal.SetUint(0)
 			}
-		} else {
-			targetRefVal.SetUint(0)
 		}
 
 	case reflect.Float32, reflect.Float64:
@@ -177,11 +165,7 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 			float64Value, ok := value[index].(float64)
 			if ok {
 				targetRefVal.SetFloat(float64Value)
-			} else {
-				targetRefVal.SetFloat(0)
 			}
-		} else {
-			targetRefVal.SetFloat(0)
 		}
 
 	case reflect.Bool:
@@ -192,11 +176,7 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 		if len(value) > index {
 			if len(value) > 0 {
 				targetRefVal.SetBool(value[index].(bool))
-			} else {
-				targetRefVal.SetBool(false)
 			}
-		} else {
-			targetRefVal.SetBool(false)
 		}
 
 	default:

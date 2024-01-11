@@ -106,6 +106,8 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("should correctly resolve multi values into struct", func(t *testing.T) {
+		t.Parallel()
+
 		type TestStruct struct {
 			A []string `config:"a"`
 			B []string `config:"b"`
@@ -165,6 +167,48 @@ func TestGet(t *testing.T) {
 		}
 		if testStruct.E[1] != "12" {
 			t.Fatalf("expected E[1] to be 12, got %s", testStruct.E[1])
+		}
+	})
+
+	t.Run("should leave default values when no replacement values are loaded", func(t *testing.T) {
+		t.Parallel()
+
+		type TestStruct struct {
+			A string `config:"a"`
+			B string `config:"b"`
+			C string `config:"c"`
+			D string `config:"d"`
+		}
+
+		testStruct := TestStruct{
+			A: "2",
+			B: "3",
+			C: "4",
+			D: "5",
+		}
+
+		conf := &orale.Loader{
+			FlagValues: map[string][]any{
+				"a": {"1"},
+				"b": {"2"},
+				"d": {"4"},
+			},
+		}
+		if err := conf.Get("", &testStruct); err != nil {
+			t.Fatal(err)
+		}
+
+		if testStruct.A != "1" {
+			t.Fatalf("expected A to be 1, got %s", testStruct.A)
+		}
+		if testStruct.B != "2" {
+			t.Fatalf("expected B to be 2, got %s", testStruct.B)
+		}
+		if testStruct.C != "4" {
+			t.Fatalf("expected C to be 4, got %s", testStruct.C)
+		}
+		if testStruct.D != "4" {
+			t.Fatalf("expected D to be 4, got %s", testStruct.D)
 		}
 	})
 }
