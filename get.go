@@ -7,6 +7,46 @@ import (
 	"unicode"
 )
 
+// Get populates loaded configuration values into the target. The target must be
+// a pointer to a variable. The target's value will be replaced with the
+// loaded configuration values. Note that if the target contains paths which
+// are not present in the loaded configuration values, those paths will be
+// ignored allowing you to set defaults. Nil pointers will be initialized.
+//
+// Example:
+
+// ```go
+//
+//	type TestConfig struct {
+//		Database struct {
+//			ConnectionUri string `config:"connection_uri"`
+//		} `config:"database"`
+//		Server struct {
+//			Port int `config:"port"`
+//		} `config:"server"`
+//		Channels []struct {
+//			Name string `config:"name"`
+//			Id   int    `config:"id"`
+//		} `config:"channels"`
+//	}
+//
+//	loader, err := orale.Load("my-app")
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	var testConfig TestConfig
+//	if err := loader.Get("", &testConfig); err != nil {
+//		panic(err)
+//	}
+//
+// ```
+//
+// As you can see in the example above, the TestConfig struct is populated with
+// the loaded configuration values. The property names of each field are
+// specified by the `config` tag. If the `config` tag is not specified, the
+// property name is converted to snake case. For example `ConnectionUri` becomes
+// `connection_uri` path.
 func (l *Loader) Get(path string, target any) error {
 	targetRefVal := reflect.ValueOf(target)
 	if targetRefVal.Kind() != reflect.Ptr {
@@ -17,6 +57,7 @@ func (l *Loader) Get(path string, target any) error {
 	return getFromLoader(l, path, targetRefVal, 0)
 }
 
+// MustGet is the same as Get except it panics if an error occurs.
 func (l *Loader) MustGet(path string, target any) {
 	err := l.Get(path, target)
 	if err != nil {

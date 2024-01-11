@@ -8,8 +8,16 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// File represents a configuration file loaded from disk.
 type File struct {
-	Path   string
+	// Path is the absolute path to the configuration file.
+	Path string
+	// Values is a map of configuration values loaded from the file. Note that
+	// these values are flattened into paths separated by periods. Slice indexes
+	// are represented by square brackets with the index inside. The value is
+	// always a slice of any. It's a slice because theoretically a configuration
+	// file could have multiple values for the same path. This is not the case with
+	// toml so as of now it's always a slice of length 1.
 	Values map[string][]any
 }
 

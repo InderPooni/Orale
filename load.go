@@ -8,6 +8,12 @@ import (
 	"unicode"
 )
 
+// Load loads configuration values from flags, environment variables, and
+// configuration files. Flags are taken from `os.Args[1:]`. Environment
+// variables are taken from `os.Environ()`. Configuration files are taken from
+// the working directory and all parent directories. The configuration file
+// name is the application name with the extension `.config.toml`. If the name
+// contain
 func Load(applicationName string) (*Loader, error) {
 	workingDir, err := os.Getwd()
 	if err != nil {
@@ -68,6 +74,9 @@ func Load(applicationName string) (*Loader, error) {
 	)
 }
 
+// LoadFromValues works like Load, but allows the caller to specify configuration
+// such as flag and environment values, as well as which path to start searching
+// for configuration files and which configuration file names to look for.
 func LoadFromValues(programArgs []string, envVarPrefix string, envVars []string, configSearchStartPath string, configFileNames []string) (*Loader, error) {
 	flagValues := loadFlags(programArgs)
 	environmentValues := loadEnvironment(envVarPrefix, envVars)
