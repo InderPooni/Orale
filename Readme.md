@@ -11,6 +11,11 @@ into your given structs.
 > Órale is pronounced Odelay in English. The name is Mexican slang which
 > translates roughly to "listen up" or "what's up?"
 
+<br>
+<br>
+<br>
+<br>
+
 ## Usage
 
 Below is an example of how you can use Orale. Note that in this example we are
