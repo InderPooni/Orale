@@ -1,7 +1,7 @@
 # Órale
 
 <p>
-  <img align="right" src="orale" width="400" />
+  <img align="right" src="orale.png" width="400" />
 </p>
 
 A fantastic little config loader for go that collects configuration from flags,
