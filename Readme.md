@@ -1,7 +1,7 @@
 # Órale
 
 <p>
-  <img align="right" src="orale.png" width="400" />
+  <img align="right" src="orale.png" width="300" />
 </p>
 
 A fantastic little config loader for go that collects configuration from flags,
@@ -11,6 +11,7 @@ into your given structs.
 > Órale is pronounced Odelay in English. The name is Mexican slang which
 > translates roughly to "listen up" or "what's up?"
 
+<br>
 <br>
 <br>
 <br>
