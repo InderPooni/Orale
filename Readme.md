@@ -1,6 +1,8 @@
 # Órale
 
-![Órale Graphic](orale.png)
+<p>
+  <img align="right" src="orale" width="400" />
+</p>
 
 A fantastic little config loader for go that collects configuration from flags,
 environment variables, and configuration files, then marshals the found values
