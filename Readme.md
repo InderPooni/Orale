@@ -1,22 +1,18 @@
-# Órale
+# Órale (Oh-rah-leh)
 
 <p>
-  <img align="right" src="orale.png" width="300" />
+  <img align="right" src="orale.png" width="400" />
 </p>
 
-A fantastic little config loader for go that collects configuration from flags,
+_A fantastic little config loader for go that collects configuration from flags,
 environment variables, and configuration files, then marshals the found values
-into your given structs.
-
+into your given structs._
 
 > Órale is pronounced Odelay in English. The name is Mexican slang which
-> translates roughly to "listen up" or "what's up?"
+> translates roughly to "listen up" or "what's up?", and is prenounced like
+> "Oh-rah-leh".
 
-<br>
-<br>
-<br>
-<br>
-<br>
+---
 
 ## Usage
 
