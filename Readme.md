@@ -14,6 +14,8 @@ into your given structs._
 
 ---
 
+<br clear="right" />
+
 ## Usage
 
 Below is an example of how you can use Orale. Note that in this example we are
