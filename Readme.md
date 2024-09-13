@@ -12,9 +12,9 @@ into your given structs._
 > translates roughly to "listen up" or "what's up?", and is prenounced like
 > "Oh-rah-leh".
 
----
-
 <br clear="right" />
+
+---
 
 ## Usage
 
