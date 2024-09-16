@@ -65,6 +65,14 @@ func (l *Loader) MustGet(path string, target any) {
 	}
 }
 
+func (l *Loader) GetAll(target any) error {
+	return l.Get("", target)
+}
+
+func (l *Loader) MustGetAll(target any) {
+	l.MustGet("", target)
+}
+
 func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, index int) error {
 	switch targetRefVal.Kind() {
 	case reflect.Ptr:
