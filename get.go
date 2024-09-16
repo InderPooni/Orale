@@ -175,7 +175,17 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 		}
 		if len(value) > index {
 			if len(value) > 0 {
-				targetRefVal.SetBool(value[index].(bool))
+				val, ok := value[index].(bool)
+				if !ok {
+					var valStr string
+					valStr, ok = value[index].(string)
+					if ok {
+						val = strings.ToLower(valStr) == "true"
+					}
+				}
+				if ok {
+					targetRefVal.SetBool(val)
+				}
 			}
 		}
 
