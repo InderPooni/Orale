@@ -65,14 +65,6 @@ func (l *Loader) MustGet(path string, target any) {
 	}
 }
 
-func (l *Loader) GetAll(target any) error {
-	return l.Get("", target)
-}
-
-func (l *Loader) MustGetAll(target any) {
-	l.MustGet("", target)
-}
-
 func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, index int) error {
 	switch targetRefVal.Kind() {
 	case reflect.Ptr:
@@ -82,16 +74,46 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 		return getFromLoader(l, currentPath, targetRefVal.Elem(), 0)
 
 	case reflect.Struct:
-		for i := 0; i < targetRefVal.NumField(); i += 1 {
-			field := targetRefVal.Type().Field(i)
-			fieldTag := field.Tag.Get("config")
+		typ := targetRefVal.Type()
+		for i := 0; i < targetRefVal.NumField(); i++ {
+			field := targetRefVal.Field(i)
+			structField := typ.Field(i)
+
+			// Check if the field is exported
+			if !field.CanSet() {
+				continue
+			}
+
+			// Handle anonymous struct fields (embedded structs)
+			if structField.Anonymous && field.Kind() == reflect.Struct {
+				fieldTag := structField.Tag.Get("config")
+				var embeddedPath string
+				if fieldTag != "" {
+					if currentPath != "" {
+						embeddedPath = currentPath + "." + fieldTag
+					} else {
+						embeddedPath = fieldTag
+					}
+				} else {
+					// If no 'config' tag, use currentPath (fields are promoted)
+					embeddedPath = currentPath
+				}
+				// Recursively process the embedded struct
+				if err := getFromLoader(l, embeddedPath, field, 0); err != nil {
+					return err
+				}
+				continue
+			}
+
+			fieldTag := structField.Tag.Get("config")
 			if fieldTag == "" {
-				fieldTag = calDefaultFieldTag(field.Name)
+				fieldTag = calDefaultFieldTag(structField.Name)
 			}
+			fieldPath := fieldTag
 			if currentPath != "" {
-				fieldTag = currentPath + "." + fieldTag
+				fieldPath = currentPath + "." + fieldTag
 			}
-			if err := getFromLoader(l, fieldTag, targetRefVal.Field(i), 0); err != nil {
+			if err := getFromLoader(l, fieldPath, field, 0); err != nil {
 				return err
 			}
 		}
@@ -183,17 +205,7 @@ func getFromLoader(l *Loader, currentPath string, targetRefVal reflect.Value, in
 		}
 		if len(value) > index {
 			if len(value) > 0 {
-				val, ok := value[index].(bool)
-				if !ok {
-					var valStr string
-					valStr, ok = value[index].(string)
-					if ok {
-						val = strings.ToLower(valStr) == "true"
-					}
-				}
-				if ok {
-					targetRefVal.SetBool(val)
-				}
+				targetRefVal.SetBool(value[index].(bool))
 			}
 		}
 

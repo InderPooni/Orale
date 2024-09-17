@@ -211,4 +211,37 @@ func TestGet(t *testing.T) {
 			t.Fatalf("expected D to be 4, got %s", testStruct.D)
 		}
 	})
+
+	t.Run("should correctly resolve values when using embedded struct", func(t *testing.T) {
+		type EmbeddedStruct struct {
+			C string `config:"c"`
+			D string `config:"d"`
+		}
+
+		type TestStruct struct {
+			A string `config:"a"`
+			B string `config:"b"`
+			EmbeddedStruct
+		}
+
+		testStruct := TestStruct{}
+
+		conf := newTestLoaderSingleValues()
+		if err := conf.Get("", &testStruct); err != nil {
+			t.Fatal(err)
+		}
+
+		if testStruct.A != "1" {
+			t.Fatalf("expected A to be 1, got %s", testStruct.A)
+		}
+		if testStruct.B != "2" {
+			t.Fatalf("expected B to be 2, got %s", testStruct.B)
+		}
+		if testStruct.C != "3" {
+			t.Fatalf("expected C to be 3, got %s", testStruct.C)
+		}
+		if testStruct.D != "4" {
+			t.Fatalf("expected D to be 4, got %s", testStruct.D)
+		}
+	})
 }
