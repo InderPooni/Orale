@@ -43,7 +43,7 @@ func main() {
   }
 
   var conf *Config
-  if err := oraleConf.Get("", conf); err != nil {
+  if err := oraleConf.GetAll(conf); err != nil {
     ...
   }
 
