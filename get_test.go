@@ -6,6 +6,25 @@ import (
 	orale "github.com/RobertWHurst/orale"
 )
 
+func TestFlagTypes(t *testing.T) {
+	type TestStruct struct {
+		FirstName string `config:"first-name"`
+	}
+
+	loader := &orale.Loader{
+		FlagValues: map[string][]any{
+			"first-name": {"Robert"},
+		},
+	}
+
+	var config TestStruct
+	err := loader.GetAll(&config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%+v", config)
+}
+
 func newTestLoaderSingleValues() *orale.Loader {
 	return &orale.Loader{
 		FlagValues: map[string][]any{

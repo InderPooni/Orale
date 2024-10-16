@@ -74,6 +74,66 @@ func Load(applicationName string) (*Loader, error) {
 	)
 }
 
+func LoadEnvSpecific(applicationName, env string) (*Loader, error) {
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
+	applicationNameRunes := []rune(applicationName)
+
+	envPrefixRunes := []rune{}
+	for i := 0; i < len(applicationNameRunes); i += 1 {
+		currentChar := applicationNameRunes[i]
+		var nextChar rune
+		if i+1 < len(applicationNameRunes) {
+			nextChar = applicationNameRunes[i+1]
+		}
+		if currentChar == '-' {
+			continue
+		}
+		if unicode.IsLower(currentChar) {
+			envPrefixRunes = append(envPrefixRunes, unicode.ToUpper(currentChar))
+			if unicode.IsUpper(nextChar) {
+				envPrefixRunes = append(envPrefixRunes, '_')
+			}
+		} else {
+			envPrefixRunes = append(envPrefixRunes, currentChar)
+		}
+	}
+	envPrefix := string(envPrefixRunes)
+
+	configNameRunes := []rune{}
+	for i := 0; i < len(applicationNameRunes); i += 1 {
+		currentChar := applicationNameRunes[i]
+		var nextChar rune
+		if i+1 < len(applicationNameRunes) {
+			nextChar = applicationNameRunes[i+1]
+		}
+		if currentChar == '_' {
+			continue
+		}
+		if unicode.IsUpper(currentChar) {
+			configNameRunes = append(configNameRunes, unicode.ToLower(currentChar))
+		} else {
+			configNameRunes = append(configNameRunes, currentChar)
+			if unicode.IsLower(currentChar) && unicode.IsUpper(nextChar) {
+				configNameRunes = append(configNameRunes, '-')
+			}
+		}
+	}
+	configName := string(configNameRunes)
+	configName = fmt.Sprintf("%s.config.toml", configName)
+
+	return LoadFromValues(
+		os.Args[1:],
+		envPrefix,
+		os.Environ(),
+		workingDir,
+		[]string{configName, fmt.Sprintf("%s-%s.config.toml", applicationName, env)},
+	)
+}
+
 // LoadFromValues works like Load, but allows the caller to specify configuration
 // such as flag and environment values, as well as which path to start searching
 // for configuration files and which configuration file names to look for.
